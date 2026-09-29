@@ -22,6 +22,7 @@ from docmerge.domain.errors import ErrorCode, MergeError, MergeStage, OrderListE
 from docmerge.domain.models import DocumentItem, Project
 from docmerge.engines import word_com
 from docmerge.reporting.logger import create_logger
+from docmerge.workers.process_runner import run_word_probe
 from docmerge.testing import quick as quick_tests
 from docmerge.testing.fakes import (FakeWord, fake_com_environment, word_unavailable_client)
 from docmerge.testing.fixtures import (WordFixtureMaker, can_open_for_write, clean_dir, docx_text, hashes_of,
@@ -210,6 +211,9 @@ def add_word_e2e_tests(suite:Suite,work,word_available):
         check(page_break_count(out)==2,f"Lappuses pārtraukumi: {page_break_count(out)}")
         check(hashes_of(paths)==before,'Avotu hash mainījās')
         check(has_zone_identifier(out) is False,'Izvadei ir Zone.Identifier')
+        probe=run_word_probe(str(out),timeout_seconds=120)
+        check(probe.get('ok') is True,f'Word nevar atvērt izvadi: {probe}')
+        check(probe.get('word_owned') is not False,f"Probe sesija nav mūsu: {probe}")
         no_leftover_word(baseline,'E2E:')
 
     with suite.test('Word E2E: idempotents rerun un backup',section=SECTION_WORD):
