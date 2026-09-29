@@ -30,6 +30,9 @@ WORD_PROCESS_NAME='WINWORD.EXE'
 # Testu/debug hook: ar šo env mainīgo var piespiest tikai Dispatch (fallback ceļu),
 # lai pārbaudītu, ka lietotāja esošā Word sesija netiek aizvērta.
 DISPATCH_METHODS_ENV='DOC_MERGE_WORD_DISPATCH_METHODS'
+# Cik ilgi pēc Quit() gaidām, kamēr WINWORD.EXE pazūd (system_check diagnozei).
+WORD_SHUTDOWN_GRACE_SECONDS=3.0
+WORD_SHUTDOWN_POLL_SECONDS=0.25
 
 _SEPARATOR_BREAK_CODES={SeparatorMode.PAGE_BREAK:WD_PAGE_BREAK,SeparatorMode.SECTION_BREAK_NEXT_PAGE:WD_SECTION_BREAK_NEXT_PAGE,SeparatorMode.SECTION_BREAK_CONTINUOUS:WD_SECTION_BREAK_CONTINUOUS}
 
@@ -240,7 +243,15 @@ def system_check():
         r['winword_pids_after']=sorted(pids_after) if pids_after is not None else None
         if pids_after is not None:
             before=set(r['winword_pids_before'] or [])
-            r['leftover_winword']=sorted(set(pids_after)-before)
+            deadline=time.time()+WORD_SHUTDOWN_GRACE_SECONDS
+            while set(pids_after)-before and time.time()<deadline:
+                # Word var aizvērties dažas sekundes; pārbaudām vēlreiz, lai neziņotu
+                # par neesošu 'leftover' procesu.
+                time.sleep(WORD_SHUTDOWN_POLL_SECONDS)
+                pids_after=word_process_ids()
+                if pids_after is None: break
+                r['winword_pids_after']=sorted(pids_after)
+            r['leftover_winword']=sorted(set(pids_after or [])-before)
     return r
 
 
