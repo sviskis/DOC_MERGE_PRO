@@ -1,0 +1,7 @@
+{
+  "sort_mode": "NATURAL_NAME",
+  "separator": "PAGE_BREAK",
+  "error_policy": "RETRY_ONCE_THEN_SKIP",
+  "word_timeout_seconds": 30,
+  "source_immutable": true
+}

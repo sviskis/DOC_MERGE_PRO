@@ -1,0 +1,47 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# --- Runtime / temp ---
+runtime/*
+!runtime/.gitkeep
+logs/*
+!logs/.gitkeep
+reports/*
+!reports/.gitkeep
+
+# --- Word / Office temp faili ---
+~$*
+*.tmp
+*.tmp.docx
+*.bak
+*.laccdb
+
+# --- Lietotāja reālie dokumenti (nekad necommittot) ---
+*.doc
+*.docx
+*.docm
+*.dot
+*.dotx
+*.dotm
+!docs_examples/*.md
+
+# --- Credentials / secrets ---
+.env
+.env.*
+*.key
+*.pem
+*token*
+credentials*.json
+gh_*.txt
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
